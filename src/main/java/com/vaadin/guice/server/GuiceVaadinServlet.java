@@ -197,10 +197,14 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
         //sets up the basic vaadin stuff like UISetup
         VaadinModule vaadinModule = new VaadinModule(this);
 
-        this.injector = createInjector(vaadinModule, combinedModules);
+        this.injector = prepareInjector(vaadinModule, combinedModules);
 
         super.init(servletConfig);
     }
+    
+    protected Injector prepareInjector(Module... modules) {
+		return createInjector(modules);
+	}
 
     private <U> Set<Class<? extends U>> nonAbstractSubtypes(Reflections reflections, Class<U> type) {
         return reflections

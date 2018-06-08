@@ -283,7 +283,7 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
                 .iterator();
     }
 
-    UidlRequestHandler getCustomUidlRequestHandlerClass() {
+    public UidlRequestHandler getCustomUidlRequestHandlerClass() {
         if (null == customUidlRequestHandlerClass) {
             return null;
         }

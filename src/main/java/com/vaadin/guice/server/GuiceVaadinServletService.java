@@ -1,11 +1,11 @@
 package com.vaadin.guice.server;
 
-import com.vaadin.server.*;
-import com.vaadin.server.communication.UidlRequestHandler;
+import com.vaadin.server.DeploymentConfiguration;
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinServiceInitListener;
+import com.vaadin.server.VaadinServletService;
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.collect.Iterators.concat;
 
@@ -22,20 +22,5 @@ class GuiceVaadinServletService extends VaadinServletService {
     @Override
     protected Iterator<VaadinServiceInitListener> getServiceInitListeners() {
         return concat(super.getServiceInitListeners(), guiceVaadinServlet.getServiceInitListeners());
-    }
-
-    @Override
-    protected List<RequestHandler> createRequestHandlers() throws ServiceException {
-        UidlRequestHandler customRequestHandler = guiceVaadinServlet.getCustomUidlRequestHandler();
-        if (null == customRequestHandler) {
-            return super.createRequestHandlers();
-        }
-
-        return super.createRequestHandlers().stream().map(handler -> {
-            if (handler instanceof UidlRequestHandler) {
-                return customRequestHandler;
-            }
-            return handler;
-        }).collect(Collectors.toList());
     }
 }

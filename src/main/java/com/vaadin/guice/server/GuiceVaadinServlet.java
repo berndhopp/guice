@@ -26,7 +26,6 @@ import com.vaadin.server.VaadinServiceInitListener;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.server.communication.UidlRequestHandler;
 import com.vaadin.ui.UI;
 
 import org.reflections.Reflections;
@@ -85,7 +84,6 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
     private Set<Class<? extends BootstrapListener>> bootStrapListenerClasses;
     private Set<Class<? extends RequestHandler>> requestHandlerClasses;
     private Set<Class<? extends VaadinServiceInitListener>> vaadinServiceInitListenerClasses;
-    private Class<? extends UidlRequestHandler> customUidlRequestHandlerClass;
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -158,7 +156,7 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
          * combine bindings from the static modules in {@link GuiceVaadinServletConfiguration#modules()} with those bindings
          * from dynamically loaded modules, see {@link RuntimeModule}.
          * This is done first so modules can install their own reflections.
-         */
+        */
         Module combinedModules = override(nonOverrideModules).with(overrideModules);
 
         this.viewClasses = nonAbstractTypes(reflections.getSubTypesOf(View.class));
@@ -171,11 +169,6 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
                 .stream()
                 .filter(cls -> !VaadinServlet.class.isAssignableFrom(cls))
                 .collect(toSet());
-
-        this.customUidlRequestHandlerClass = nonAbstractTypes(reflections.getSubTypesOf(UidlRequestHandler.class))
-                .stream()
-                .filter(cls -> !VaadinServlet.class.isAssignableFrom(cls))
-                .findFirst().orElse(null);
 
         this.sessionDestroyListenerClasses = nonAbstractTypes(reflections.getSubTypesOf(SessionDestroyListener.class));
         this.serviceDestroyListeners = nonAbstractTypes(reflections.getSubTypesOf(ServiceDestroyListener.class));
@@ -283,18 +276,11 @@ public class GuiceVaadinServlet extends VaadinServlet implements SessionInitList
                 .iterator();
     }
 
-    UidlRequestHandler getCustomUidlRequestHandler() {
-        if (null == customUidlRequestHandlerClass) {
-            return null;
-        }
-        return getInjector().getInstance(customUidlRequestHandlerClass);
-    }
-
     Set<Class<? extends ViewChangeListener>> getViewChangeListeners(Class<? extends UI> uiClass) {
         return viewChangeListenerCache.computeIfAbsent(uiClass, u -> getApplicable(u, viewChangeListenerClasses));
     }
 
-    Set<Class<?>> getControllerClasses(Class<? extends UI> uiClass) {
+    Set<Class<?>> getControllerClasses(Class<? extends UI> uiClass){
         return controllerCache.computeIfAbsent(uiClass, uic -> getApplicableControllers(uic, controllerClasses));
     }
 

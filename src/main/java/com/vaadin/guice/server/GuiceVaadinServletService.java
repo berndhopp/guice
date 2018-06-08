@@ -26,7 +26,7 @@ class GuiceVaadinServletService extends VaadinServletService {
 
     @Override
     protected List<RequestHandler> createRequestHandlers() throws ServiceException {
-        UidlRequestHandler customRequestHandler = guiceVaadinServlet.getCustomUidlRequestHandler();
+        UidlRequestHandler customRequestHandler = guiceVaadinServlet.getCustomUidlRequestHandlerClass();
         if (null == customRequestHandler) {
             return super.createRequestHandlers();
         }
